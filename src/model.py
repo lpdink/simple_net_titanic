@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 
 input_shape=(7,)
-unit_nums = 128
+unit_nums = 512
 
 # model
 class GreatNet(tf.keras.Model):
@@ -17,7 +17,7 @@ class GreatNet(tf.keras.Model):
                 unit_nums, activation='ReLU', name="dense_32"
             ),
             tf.keras.layers.Dense(
-                1, activation=None, use_bias=False
+                1, activation="sigmoid", use_bias=False
             )
         ]
         self.great_net = tf.keras.models.Sequential(layers)

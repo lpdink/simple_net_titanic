@@ -24,11 +24,11 @@ if __name__=="__main__":
     model._build()
     dataset = TitanicDataSet()
     optimizer = tf.keras.optimizers.Adam()
-    loss_function = tf.keras.losses.BinaryCrossentropy(from_logits=True)
+    loss_function = tf.keras.losses.BinaryCrossentropy(from_logits=False)
 
     checkpoint = tf.train.Checkpoint(optimizer=optimizer, model=model)
     manager = tf.train.CheckpointManager(
-    checkpoint, directory="../resource/ckpts/", max_to_keep=5)
+    checkpoint, directory="../resource/ckpts_dense512/", max_to_keep=5)
     status = checkpoint.restore(manager.latest_checkpoint)
 
     tmp_loss=0
@@ -39,6 +39,7 @@ if __name__=="__main__":
                 with tf.GradientTape() as tape:
                     out = model(data["x_label"])
                     loss = loss_function(data["y_label"], out)
+                    print(loss)
                 tmp_loss+=loss
                 grads = tape.gradient(loss, model.trainable_variables)
                 optimizer.apply_gradients(zip(grads, model.trainable_variables))
