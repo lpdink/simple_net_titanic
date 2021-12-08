@@ -1,5 +1,7 @@
+# coding=UTF-8
 import pandas as pd
 import numpy as np
+import tensorflow as tf
 '''
 第三维，Pclass:1,2,3
 第五，Sex: 0/1 male=1 female=2
@@ -46,10 +48,13 @@ class TitanicDataSet:
     def __getitem__(self, index):
         return{
             "x_label":self.x_data[index].reshape([1,-1]),
-            "y_label":self.y_data[index]
+            "y_label":np.array(self.y_data[index]).reshape([1,1])
         }
 
 
 if __name__=="__main__":
     data=TitanicDataSet()
+    import pdb
+    pdb.set_trace()
+    
 

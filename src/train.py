@@ -1,4 +1,5 @@
 # coding=UTF-8
+import sys
 import numpy as np
 import tensorflow as tf
 import pandas as pd
@@ -23,16 +24,30 @@ if __name__=="__main__":
     model._build()
     dataset = TitanicDataSet()
     optimizer = tf.keras.optimizers.Adam()
+    loss_function = tf.keras.losses.BinaryCrossentropy(from_logits=True)
+
+    checkpoint = tf.train.Checkpoint(optimizer=optimizer, model=model)
+    manager = tf.train.CheckpointManager(
+    checkpoint, directory="../resource/ckpts/", max_to_keep=5)
+    status = checkpoint.restore(manager.latest_checkpoint)
+
     tmp_loss=0
-    for epoch in range(200):
-        for flag, data in enumerate(dataset):
-            with tf.GradientTape() as tape:
-                out = model(data["x_label"])
-                loss = tf.losses.mean_squared_error(data["y_label"], out)
-            tmp_loss+=loss
-            if flag%100==0:
-                print(epoch, flag, tmp_loss)
-                tmp_loss=0
-            grads = tape.gradient(loss, model.trainable_variables)
-            optimizer.apply_gradients(zip(grads, model.trainable_variables))
+    try:
+        for epoch in range(1, 201):
+            #dataset = dataset.shuffle(10, reshuffle_each_iteration=True)
+            for flag, data in enumerate(dataset):
+                with tf.GradientTape() as tape:
+                    out = model(data["x_label"])
+                    loss = loss_function(data["y_label"], out)
+                tmp_loss+=loss
+                grads = tape.gradient(loss, model.trainable_variables)
+                optimizer.apply_gradients(zip(grads, model.trainable_variables))
+            print("epoch: {} loss:{}".format(epoch, tmp_loss))
+            tmp_loss = 0
+            if epoch%50==0:
+                manager.save()
+                print("epoch: {}ckpts saved in /resource/ckpts".format(epoch))
+    except KeyboardInterrupt:
+        manager.save()
+
     pdb.set_trace()

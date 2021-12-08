@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 
 input_shape=(7,)
-unit_nums = 32
+unit_nums = 128
 
 # model
 class GreatNet(tf.keras.Model):
